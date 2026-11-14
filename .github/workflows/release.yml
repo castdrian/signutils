@@ -92,7 +92,7 @@ jobs:
                   APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
                   APP_STORE_CONNECT_PRIVATE_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 }}
               run: ./scripts/archive.sh ${{ matrix.platform }} ${{ env.DRY_RUN == 'true' && 'export' || 'upload' }}
-            - uses: actions/upload-artifact@v4
+            - uses: actions/upload-artifact@v7
               with:
                   name: export-${{ matrix.platform }}
                   path: build/export-${{ matrix.platform }}
