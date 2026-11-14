@@ -1,0 +1,1 @@
+Generate a .p12 and provisioning profile for any App ID in one guided flow, then keep every bundle in a library.

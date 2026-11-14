@@ -1,0 +1,46 @@
+name: Screenshots
+
+on:
+    workflow_dispatch:
+        inputs:
+            targets:
+                description: Targets to render, any of iphone ipad mac
+                type: string
+                default: iphone ipad mac
+
+permissions:
+    contents: write
+
+jobs:
+    render:
+        runs-on: macos-26
+        timeout-minutes: 120
+        steps:
+            - uses: actions/checkout@v5
+            - uses: maxim-lobanov/setup-xcode@v1
+              with:
+                  xcode-version: latest-stable
+            - name: Install XcodeGen
+              run: brew install xcodegen
+            - run: xcodegen generate
+            - name: Render the App Store screenshots in demo mode
+              env:
+                  TARGETS: ${{ inputs.targets }}
+              run: |
+                  read -ra targets <<< "$TARGETS"
+                  ./scripts/screenshots.sh "${targets[@]}"
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: screenshots
+                  path: fastlane/screenshots
+            - name: Commit the screenshots
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add fastlane/screenshots
+                  if git diff --cached --quiet; then
+                    echo "The screenshots did not change."
+                    exit 0
+                  fi
+                  git commit -q -m "docs: regenerate the App Store screenshots"
+                  git push -q origin HEAD

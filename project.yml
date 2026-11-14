@@ -1,0 +1,104 @@
+name: SignUtils
+options:
+  bundleIdPrefix: dev.adrian
+  deploymentTarget:
+    iOS: "18.0"
+    macOS: "15.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+  groupSortPosition: top
+configFiles:
+  Debug: Config.xcconfig
+  Release: Config.xcconfig
+settings:
+  base:
+    DEVELOPMENT_TEAM: L988J7YMK5
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_EMIT_LOC_STRINGS: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+  configs:
+    Release:
+      DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+packages:
+  SignKit:
+    path: Packages/SignKit
+targets:
+  SignUtils:
+    type: application
+    supportedDestinations: [iOS, macOS]
+    sources:
+      - path: SignUtils
+        excludes:
+          - "**/*.entitlements"
+      - path: AppIcon.icon
+        buildPhase: resources
+    dependencies:
+      - package: SignKit
+    entitlements:
+      path: SignUtils/SignUtils.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.files.user-selected.read-write: true
+    info:
+      path: SignUtils/Info.plist
+      properties:
+        CFBundleDisplayName: SignUtils
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        ITSAppUsesNonExemptEncryption: false
+        LSApplicationCategoryType: public.app-category.developer-tools
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIApplicationSupportsIndirectInputEvents: true
+        LSSupportsOpeningDocumentsInPlace: false
+        UIFileSharingEnabled: true
+    settings:
+      base:
+        PRODUCT_NAME: SignUtils
+        PRODUCT_BUNDLE_IDENTIFIER: dev.adrian.signtools
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_PREVIEWS: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        INFOPLIST_KEY_UIUserInterfaceStyle: Automatic
+  SignUtilsUITests:
+    type: bundle.ui-testing
+    supportedDestinations: [iOS, macOS]
+    sources:
+      - path: SignUtilsUITests
+    dependencies:
+      - target: SignUtils
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.adrian.signtools.uitests
+        TEST_TARGET_NAME: SignUtils
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  SignUtils:
+    build:
+      targets:
+        SignUtils: all
+        SignUtilsUITests: [test]
+    test:
+      targets:
+        - SignUtilsUITests
+      gatherCoverageData: true
+    archive:
+      config: Release

@@ -1,0 +1,26 @@
+SignUtils takes the busywork out of preparing signing assets for sideloading with an Apple Developer Program membership.
+
+Instead of creating a certificate signing request, registering an App ID, ticking capabilities, picking device UDIDs, downloading a certificate, exporting a .p12 and generating a provisioning profile by hand, you answer a few questions and SignUtils does the rest through the App Store Connect API.
+
+ONE GUIDED FLOW
+• Choose Development or Ad Hoc signing and the certificate type
+• Pick an existing App ID or register a new one, including wildcards
+• Turn on the capabilities the app needs, such as App Groups, iCloud, Push Notifications, Associated Domains or Network Extensions
+• Select registered devices or register new ones by UDID
+• Create a new certificate or reuse one SignUtils made before
+
+READY-TO-IMPORT ARCHIVES
+Every bundle is a zip with the .p12, its password, the .mobileprovision, the certificate and a summary, ready for your signing tool of choice.
+
+A LIBRARY YOU CAN TRUST
+SignUtils keeps every bundle you generate, shows when it expires and notices when its certificate was revoked or its profile deleted. Share an archive again or copy its password anytime.
+
+CLEAN UP JUST AS EASILY
+Revoke certificates, delete provisioning profiles and App IDs, edit capabilities, and register, rename, enable or disable devices.
+
+PRIVATE BY DESIGN
+Your API key and private keys stay in this device’s Keychain. SignUtils only talks to Apple’s App Store Connect API and has no accounts, analytics or servers of its own.
+
+SignUtils requires an App Store Connect API key with the Admin or App Manager role. Explore the built-in demo to try every feature without one.
+
+SignUtils is open source: github.com/itoolio/signutils

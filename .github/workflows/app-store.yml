@@ -1,0 +1,75 @@
+name: App Store
+
+on:
+    workflow_call:
+        inputs:
+            version:
+                type: string
+                required: true
+            build:
+                type: string
+                default: ""
+            submit:
+                type: boolean
+                default: true
+    workflow_dispatch:
+        inputs:
+            version:
+                description: App Store version to update, for example 1.0.0
+                required: true
+            build:
+                description: Build number to submit with metadata and screenshots; leave empty to only update metadata and screenshots
+                required: false
+                default: ""
+            submit:
+                description: Submit the version for review
+                type: boolean
+                default: true
+
+permissions:
+    contents: read
+
+concurrency:
+    group: app-store-${{ inputs.version }}
+    cancel-in-progress: false
+
+jobs:
+    deliver:
+        runs-on: macos-26
+        timeout-minutes: 120
+        strategy:
+            fail-fast: false
+            matrix:
+                platform: [ios, mac]
+        steps:
+            - uses: actions/checkout@v5
+            - uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: "3.4"
+                  bundler-cache: true
+            - name: Write the release notes
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  VERSION: ${{ inputs.version }}
+              run: |
+                  NOTES=$(gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" --json body --jq .body 2>/dev/null \
+                    | sed -E 's/\[([^]]+)\]\([^)]+\)/\1/g; s/^#+ //; s/^\* /• /; /^$/d' | cut -c1-4000 || true)
+                  if [ -n "$NOTES" ]; then
+                    printf '%s\n' "$NOTES" > fastlane/metadata/en-US/release_notes.txt
+                  fi
+                  cat fastlane/metadata/en-US/release_notes.txt
+            - name: Upload metadata and screenshots and submit
+              env:
+                  APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+                  APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+                  APP_STORE_CONNECT_PRIVATE_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 }}
+                  REVIEW_CONTACT_FIRST_NAME: ${{ secrets.REVIEW_CONTACT_FIRST_NAME }}
+                  REVIEW_CONTACT_LAST_NAME: ${{ secrets.REVIEW_CONTACT_LAST_NAME }}
+                  REVIEW_CONTACT_EMAIL: ${{ secrets.REVIEW_CONTACT_EMAIL }}
+                  REVIEW_CONTACT_PHONE: ${{ secrets.REVIEW_CONTACT_PHONE }}
+                  VERSION: ${{ inputs.version }}
+                  BUILD: ${{ inputs.build }}
+                  SUBMIT: ${{ inputs.submit }}
+                  LC_ALL: en_US.UTF-8
+                  LANG: en_US.UTF-8
+              run: bundle exec fastlane ${{ matrix.platform }} release version:"$VERSION" build:"$BUILD" submit:"$SUBMIT"

@@ -1,0 +1,37 @@
+name: Live App Store Connect
+
+on:
+    workflow_dispatch:
+        inputs:
+            ad_hoc:
+                description: Also create and revoke an Apple Distribution certificate
+                type: boolean
+                default: false
+    schedule:
+        - cron: "23 5 * * 1"
+
+permissions:
+    contents: read
+
+concurrency:
+    group: live-e2e
+    cancel-in-progress: false
+
+jobs:
+    live:
+        runs-on: macos-26
+        timeout-minutes: 30
+        steps:
+            - uses: actions/checkout@v5
+            - uses: maxim-lobanov/setup-xcode@v1
+              with:
+                  xcode-version: latest-stable
+            - name: Generate, verify and revoke real signing assets
+              working-directory: Packages/SignKit
+              env:
+                  SIGNUTILS_E2E: "1"
+                  SIGNUTILS_E2E_ADHOC: ${{ inputs.ad_hoc && '1' || '0' }}
+                  APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+                  APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+                  APP_STORE_CONNECT_PRIVATE_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 }}
+              run: swift test --filter LiveTests

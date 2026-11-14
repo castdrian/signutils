@@ -1,0 +1,130 @@
+name: Release
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch:
+        inputs:
+            dry_run:
+                description: Archive and sign in the cloud without uploading or publishing anything
+                type: boolean
+                default: true
+            version:
+                description: Version to use for a dry run
+                type: string
+                default: 1.0.0
+
+concurrency:
+    group: release-${{ github.ref }}
+    cancel-in-progress: false
+
+env:
+    DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    SEMANTIC_RELEASE: >-
+        npx --yes
+        -p semantic-release@25
+        -p @semantic-release/changelog@6
+        -p @semantic-release/exec@7
+        -p @semantic-release/git@10
+        -p conventional-changelog-conventionalcommits@9
+        semantic-release
+
+defaults:
+    run:
+        shell: bash
+
+jobs:
+    checks:
+        uses: ./.github/workflows/ci.yml
+
+    version:
+        runs-on: ubuntu-24.04
+        permissions:
+            contents: write
+        outputs:
+            version: ${{ steps.next.outputs.version }}
+            build-number: ${{ steps.next.outputs.build-number }}
+        steps:
+            - uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+            - uses: actions/setup-node@v5
+              with:
+                  node-version: lts/*
+            - name: Work out the next version
+              id: next
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  DRY_RUN_VERSION: ${{ inputs.version }}
+              run: |
+                  if [ "$DRY_RUN" = "true" ]; then
+                    echo "version=$DRY_RUN_VERSION" >> "$GITHUB_OUTPUT"
+                  else
+                    $SEMANTIC_RELEASE --dry-run --no-ci
+                    if [ -f .next-version ]; then
+                      echo "version=$(cat .next-version)" >> "$GITHUB_OUTPUT"
+                    fi
+                  fi
+                  echo "build-number=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
+
+    app-store:
+        needs: [checks, version]
+        if: needs.version.outputs.version != ''
+        runs-on: macos-26
+        timeout-minutes: 90
+        strategy:
+            fail-fast: false
+            matrix:
+                platform: [ios, macos]
+        steps:
+            - uses: actions/checkout@v5
+            - uses: maxim-lobanov/setup-xcode@v1
+              with:
+                  xcode-version: latest-stable
+            - name: Install XcodeGen
+              run: brew install xcodegen
+            - run: ./scripts/set-version.sh "${{ needs.version.outputs.version }}" "${{ needs.version.outputs.build-number }}"
+            - run: xcodegen generate
+            - name: Archive, sign in the cloud and upload
+              env:
+                  APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+                  APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+                  APP_STORE_CONNECT_PRIVATE_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY_BASE64 }}
+              run: ./scripts/archive.sh ${{ matrix.platform }} ${{ env.DRY_RUN == 'true' && 'export' || 'upload' }}
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: export-${{ matrix.platform }}
+                  path: build/export-${{ matrix.platform }}
+                  if-no-files-found: warn
+
+    publish:
+        needs: [version, app-store]
+        if: github.event_name == 'push'
+        runs-on: ubuntu-24.04
+        outputs:
+            version: ${{ needs.version.outputs.version }}
+            build-number: ${{ needs.version.outputs.build-number }}
+        permissions:
+            contents: write
+            issues: write
+            pull-requests: write
+        steps:
+            - uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+            - uses: actions/setup-node@v5
+              with:
+                  node-version: lts/*
+            - name: Tag the release and write the changelog
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: $SEMANTIC_RELEASE
+
+    submit:
+        needs: publish
+        uses: ./.github/workflows/app-store.yml
+        with:
+            version: ${{ needs.publish.outputs.version }}
+            build: ${{ needs.publish.outputs.build-number }}
+            submit: true
+        secrets: inherit

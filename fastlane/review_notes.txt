@@ -1,0 +1,3 @@
+SignUtils needs an App Store Connect API key from a paid Apple Developer Program membership. To review every feature without one, tap "Explore the Demo" on the first screen. The demo runs entirely on the device against simulated App Store Connect data, so creating, sharing and revoking signing bundles works without an account.
+
+With a real key, SignUtils calls only api.appstoreconnect.apple.com to manage the developer's own certificates, App IDs, devices and provisioning profiles, and stores the key and generated private keys in the Keychain. Generated archives are saved in the app's container and shared through the system share sheet or save panel.
