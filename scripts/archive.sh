@@ -3,8 +3,14 @@ set -euo pipefail
 platform="$1"
 mode="${2:-upload}"
 case "$platform" in
-  ios) destination="generic/platform=iOS" ;;
-  macos) destination="generic/platform=macOS" ;;
+  ios)
+    destination="generic/platform=iOS"
+    signing=(CODE_SIGNING_ALLOWED=NO)
+    ;;
+  macos)
+    destination="generic/platform=macOS"
+    signing=(CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- PROVISIONING_PROFILE_SPECIFIER=)
+    ;;
   *) echo "usage: archive.sh ios|macos [upload|export]" >&2; exit 64 ;;
 esac
 : "${APP_STORE_CONNECT_KEY_ID:?}" "${APP_STORE_CONNECT_ISSUER_ID:?}" "${APP_STORE_CONNECT_PRIVATE_KEY_BASE64:?}"
@@ -21,9 +27,7 @@ xcodebuild archive \
   -destination "$destination" \
   -archivePath "$archive" \
   -derivedDataPath build/archive-dd \
-  CODE_SIGN_STYLE=Manual \
-  CODE_SIGN_IDENTITY=- \
-  PROVISIONING_PROFILE_SPECIFIER= \
+  "${signing[@]}" \
   DEVELOPMENT_TEAM=L988J7YMK5 | xcbeautify
 options=ExportOptions-AppStore.plist
 if [ "$mode" = "export" ]; then
