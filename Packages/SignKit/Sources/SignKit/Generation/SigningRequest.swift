@@ -16,7 +16,7 @@ public enum SigningKind: String, Codable, Sendable, CaseIterable, Identifiable {
     public var summary: String {
         switch self {
         case .development:
-            "Debuggable builds for your own devices. Supports get-task-allow, so debuggers and JIT enablers can attach."
+            "Debuggable builds for your team’s registered devices, with get-task-allow so the debugger can attach."
         case .adHoc:
             "Release builds for up to 100 devices per device type. Not debuggable, closest to how App Store apps run."
         }

@@ -14,7 +14,7 @@ struct OnboardingView: View {
                             .shadow(color: .accentColor.opacity(0.35), radius: 18, y: 8)
                         Text("SignUtils")
                             .font(.largeTitle.bold())
-                        Text("Signing assets for sideloading, without the developer portal busywork.")
+                        Text("Certificates, profiles and App IDs, without the developer portal busywork.")
                             .font(.title3)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)

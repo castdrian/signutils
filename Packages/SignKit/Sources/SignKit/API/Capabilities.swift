@@ -46,7 +46,7 @@ public struct CapabilityType: OpenEnum, Identifiable, Comparable {
         .wirelessAccessoryConfiguration,
     ].sorted()
 
-    public static let sideloadingEssentials: [CapabilityType] = [
+    public static let commonCapabilities: [CapabilityType] = [
         .appGroups, .associatedDomains, .iCloud, .pushNotifications, .networkExtensions, .personalVPN, .siriKit,
         .healthKit, .homeKit, .accessWiFiInformation,
     ]

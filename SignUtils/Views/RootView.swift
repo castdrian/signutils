@@ -9,35 +9,43 @@ struct RootView: View {
         @Bindable var model = model
         Group {
             if model.hasAccount {
-                TabView(selection: $model.selection) {
-                    Tab(SidebarItem.library.title, systemImage: SidebarItem.library.symbol, value: SidebarItem.library) {
-                        LibraryView()
+                #if os(macOS)
+                    MacRootView()
+                        .sheet(isPresented: $model.isCreating) {
+                            CreateBundleView()
+                                .environment(model)
+                        }
+                #else
+                    TabView(selection: $model.selection) {
+                        Tab(SidebarItem.library.title, systemImage: SidebarItem.library.symbol, value: SidebarItem.library) {
+                            LibraryView()
+                        }
+                        TabSection("Developer Account") {
+                            Tab(SidebarItem.certificates.title, systemImage: SidebarItem.certificates.symbol, value: SidebarItem.certificates) {
+                                CertificatesView()
+                            }
+                            Tab(SidebarItem.profiles.title, systemImage: SidebarItem.profiles.symbol, value: SidebarItem.profiles) {
+                                ProfilesView()
+                            }
+                            Tab(SidebarItem.appIDs.title, systemImage: SidebarItem.appIDs.symbol, value: SidebarItem.appIDs) {
+                                AppIDsView()
+                            }
+                            Tab(SidebarItem.devices.title, systemImage: SidebarItem.devices.symbol, value: SidebarItem.devices) {
+                                DevicesView()
+                            }
+                        }
+                        if sizeClass != .compact {
+                            Tab(SidebarItem.settings.title, systemImage: SidebarItem.settings.symbol, value: SidebarItem.settings) {
+                                SettingsView()
+                            }
+                        }
                     }
-                    TabSection("Developer Account") {
-                        Tab(SidebarItem.certificates.title, systemImage: SidebarItem.certificates.symbol, value: SidebarItem.certificates) {
-                            CertificatesView()
-                        }
-                        Tab(SidebarItem.profiles.title, systemImage: SidebarItem.profiles.symbol, value: SidebarItem.profiles) {
-                            ProfilesView()
-                        }
-                        Tab(SidebarItem.appIDs.title, systemImage: SidebarItem.appIDs.symbol, value: SidebarItem.appIDs) {
-                            AppIDsView()
-                        }
-                        Tab(SidebarItem.devices.title, systemImage: SidebarItem.devices.symbol, value: SidebarItem.devices) {
-                            DevicesView()
-                        }
+                    .tabViewStyle(.sidebarAdaptable)
+                    .sheet(isPresented: $model.isCreating) {
+                        CreateBundleView()
+                            .environment(model)
                     }
-                    if sizeClass != .compact {
-                        Tab(SidebarItem.settings.title, systemImage: SidebarItem.settings.symbol, value: SidebarItem.settings) {
-                            SettingsView()
-                        }
-                    }
-                }
-                .tabViewStyle(.sidebarAdaptable)
-                .sheet(isPresented: $model.isCreating) {
-                    CreateBundleView()
-                        .environment(model)
-                }
+                #endif
             } else {
                 OnboardingView()
             }
@@ -76,3 +84,34 @@ struct ToastView: View {
         }
     }
 }
+
+#if os(macOS)
+    struct MacRootView: View {
+        @Environment(AppModel.self) private var model
+
+        var body: some View {
+            @Bindable var model = model
+            NavigationSplitView {
+                List(selection: Binding<SidebarItem?>(get: { model.selection }, set: { if let value = $0 { model.selection = value } })) {
+                    Label(SidebarItem.library.title, systemImage: SidebarItem.library.symbol).tag(SidebarItem.library)
+                    Section("Developer Account") {
+                        ForEach([SidebarItem.certificates, .profiles, .appIDs, .devices]) { item in
+                            Label(item.title, systemImage: item.symbol).tag(item)
+                        }
+                    }
+                    Label(SidebarItem.settings.title, systemImage: SidebarItem.settings.symbol).tag(SidebarItem.settings)
+                }
+                .navigationSplitViewColumnWidth(min: 190, ideal: 210)
+            } detail: {
+                switch model.selection {
+                case .library: LibraryView()
+                case .certificates: CertificatesView()
+                case .profiles: ProfilesView()
+                case .appIDs: AppIDsView()
+                case .devices: DevicesView()
+                case .settings: SettingsView()
+                }
+            }
+        }
+    }
+#endif

@@ -33,7 +33,7 @@ struct CreateBundleView: View {
                     }
                 }
             }
-            .interactiveDismissDisabled(flow.phase == .generating)
+            .interactiveDismissDisabled(!isFinished)
             .animation(.snappy, value: flow.step)
             .animation(.snappy, value: flow.phase)
         }

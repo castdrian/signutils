@@ -38,7 +38,7 @@ struct GenerationView: View {
                     .font(.system(size: 64))
                     .foregroundStyle(.green)
                     .symbolEffect(.bounce, value: entry.id)
-                Text("Ready to sideload").font(.title.bold())
+                Text("Signing bundle ready").font(.title.bold())
                 Text("\(entry.bundle.name) is in your library.")
                     .foregroundStyle(.secondary)
             }

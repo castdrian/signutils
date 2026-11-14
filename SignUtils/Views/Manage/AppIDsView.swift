@@ -29,6 +29,7 @@ struct AppIDsView: View {
                 }
             }
             .overlay { LoadingOverlay(isEmpty: model.bundleIDs.isEmpty) }
+            .adaptiveListStyle()
             .navigationTitle("App IDs")
             .navigationDestination(for: BundleID.self) { AppIDDetailView(bundleID: $0) }
             .searchable(text: $search, prompt: "Search \(model.bundleIDs.count) App IDs")
@@ -238,6 +239,7 @@ struct DevicesView: View {
                 }
             }
             .overlay { LoadingOverlay(isEmpty: model.devices.isEmpty) }
+            .adaptiveListStyle()
             .navigationTitle("Devices")
             .refreshable { await model.refresh() }
             .toolbar {

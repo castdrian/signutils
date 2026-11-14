@@ -405,8 +405,8 @@ final class AppModel {
         guard let devices = try? await demo.devices(), let bundleIDs = try? await demo.bundleIDs() else { return }
         let phones = devices.filter { $0.status == .enabled && $0.deviceClass != .appleTV }
         let plans: [(String, SigningKind, String, Set<CapabilityType>)] = [
-            ("Feather", .development, "com.demo.feather", [.appGroups, .associatedDomains, .networkExtensions]),
-            ("Emulator Ad Hoc", .adHoc, "com.demo.emulator", [.gameCenter, .iCloud]),
+            ("Field Notes", .development, "com.demo.fieldnotes", [.appGroups, .associatedDomains, .networkExtensions]),
+            ("Pixel Studio Ad Hoc", .adHoc, "com.demo.pixelstudio", [.gameCenter, .iCloud]),
             ("Music Player", .development, "com.demo.music", [.pushNotifications, .appGroups]),
         ]
         for (index, plan) in plans.enumerated() {

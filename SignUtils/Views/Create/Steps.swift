@@ -70,7 +70,7 @@ struct AppIDStep: View {
 
     var body: some View {
         Form {
-            StepHeader(title: "Which App ID?", subtitle: "The bundle identifier you will re-sign the app with.")
+            StepHeader(title: "Which App ID?", subtitle: "The bundle identifier the profile is issued for.")
             Section {
                 Picker("App ID", selection: $flow.appIDMode) {
                     ForEach(CreateFlow.AppIDMode.allCases) { Text($0.rawValue).tag($0) }
@@ -164,8 +164,8 @@ struct CapabilitiesStep: View {
                     Toggle("Update capabilities on the App ID", isOn: $flow.manageCapabilities)
                     if flow.manageCapabilities {
                         HStack {
-                            Button("Sideloading Essentials") {
-                                flow.capabilities.formUnion(CapabilityType.sideloadingEssentials)
+                            Button("Common Capabilities") {
+                                flow.capabilities.formUnion(CapabilityType.commonCapabilities)
                             }
                             Spacer()
                             Button("Clear") { flow.capabilities = flow.capabilities.filter(\.isAlwaysOn) }
@@ -381,6 +381,7 @@ struct DeviceRow: View {
             }
         }
         .contentShape(.rect)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 

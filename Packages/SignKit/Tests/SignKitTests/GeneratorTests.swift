@@ -67,20 +67,20 @@ struct GeneratorTests {
         let service = try DemoAppStoreConnect()
         let vault = PrivateKeyVault(store: MemoryStore())
         let generator = SigningGenerator(service: service, keys: vault, credentialsKeyID: "DEMOKEY123")
-        let feather = try await service.bundleIDs().first { $0.identifier == "com.demo.feather" }!
+        let fieldNotes = try await service.bundleIDs().first { $0.identifier == "com.demo.fieldnotes" }!
         let device = try await service.devices().first { $0.deviceClass == .iPad }!
         let first = try await generator.generate(
             SigningRequest(
-                kind: .adHoc, appID: .existing(feather), capabilities: [.appGroups, .healthKit], devices: [device],
-                certificate: .new(type: .distribution, commonName: "SignUtils"), password: "a", name: "Feather"))
+                kind: .adHoc, appID: .existing(fieldNotes), capabilities: [.appGroups, .healthKit], devices: [device],
+                certificate: .new(type: .distribution, commonName: "SignUtils"), password: "a", name: "Field Notes"))
         #expect(Set(first.bundle.capabilities) == [.appGroups, .healthKit])
         #expect(first.bundle.profileType == .iosAppAdHoc)
 
         let certificate = try await service.certificate(id: first.bundle.certificateID)
         let second = try await generator.generate(
             SigningRequest(
-                kind: .adHoc, appID: .existing(feather), capabilities: [.appGroups, .healthKit], devices: [device],
-                certificate: .existing(certificate), password: "b", name: "Feather"))
+                kind: .adHoc, appID: .existing(fieldNotes), capabilities: [.appGroups, .healthKit], devices: [device],
+                certificate: .existing(certificate), password: "b", name: "Field Notes"))
         #expect(second.bundle.certificateID == first.bundle.certificateID)
         #expect(second.bundle.profileID != first.bundle.profileID)
         #expect(try await service.certificates().filter { $0.certificateType == .distribution }.count == 2)
@@ -147,9 +147,9 @@ struct GeneratorTests {
         let device = try await service.devices().first!
         let artifacts = try await generator.generate(
             SigningRequest(
-                kind: .development, appID: .new(identifier: "com.demo.feather", name: "Feather"), capabilities: [.appGroups],
+                kind: .development, appID: .new(identifier: "com.demo.fieldnotes", name: "Field Notes"), capabilities: [.appGroups],
                 devices: [device], certificate: .new(type: .development, commonName: "SignUtils"), password: "a",
-                name: "Feather"))
+                name: "Field Notes"))
         #expect(artifacts.bundle.bundleIDResource == "BID1")
     }
 

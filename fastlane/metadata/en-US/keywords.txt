@@ -1,1 +1,1 @@
-sideload,signing,certificate,provisioning,profile,p12,udid,app id,developer,capabilities
+codesign,signing,certificate,provisioning,profile,p12,udid,app id,developer,capabilities

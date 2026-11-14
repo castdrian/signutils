@@ -63,7 +63,7 @@ struct ArchiveTests {
         #expect(!BundleIdentifier.isValid("single"))
         #expect(!BundleIdentifier.isValid("com.exa mple"))
         #expect(BundleIdentifier.suggestedName(for: "com.example.my-app") == "My app")
-        #expect(BundleIdentifier.apiName("Feather (sideload) #1") == "Feather sideload 1")
+        #expect(BundleIdentifier.apiName("Field Notes (beta) #1") == "Field Notes beta 1")
         #expect(SigningBundle.slug("My App / Dev") == "My-App-Dev")
         #expect(Passwords.generate().count == 20)
     }

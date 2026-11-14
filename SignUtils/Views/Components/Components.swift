@@ -28,6 +28,15 @@ extension View {
     }
 
     @ViewBuilder
+    func adaptiveListStyle() -> some View {
+        #if os(macOS)
+            listStyle(.inset).environment(\.defaultMinListRowHeight, 44)
+        #else
+            self
+        #endif
+    }
+
+    @ViewBuilder
     func plainTextInput() -> some View {
         #if os(iOS)
             textInputAutocapitalization(.never).autocorrectionDisabled()
@@ -208,24 +217,35 @@ struct DemoBanner: View {
 
     var body: some View {
         if model.isDemo, !ProcessInfo.processInfo.arguments.contains("-screenshots") {
-            Section {
-                HStack(spacing: 12) {
-                    Image(systemName: "sparkles")
-                        .font(.title3)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Demo mode").font(.subheadline.weight(.semibold))
-                        Text("Nothing here touches a real account.").font(.caption).opacity(0.85)
-                    }
-                    Spacer()
-                    Button("Exit") { Task { await model.leaveDemo() } }
-                        .buttonStyle(.bordered)
-                        .tint(.white)
-                        .controlSize(.small)
+            #if os(macOS)
+                banner
+                    .padding(14)
+                    .background(Color.indigo.gradient, in: .rect(cornerRadius: 12))
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
+            #else
+                Section {
+                    banner.listRowBackground(Rectangle().fill(Color.indigo.gradient))
                 }
-                .foregroundStyle(.white)
-                .listRowBackground(Rectangle().fill(Color.indigo.gradient))
-            }
+            #endif
         }
+    }
+
+    private var banner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "sparkles")
+                .font(.title3)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Demo mode").font(.subheadline.weight(.semibold))
+                Text("Nothing here touches a real account.").font(.caption).opacity(0.85)
+            }
+            Spacer()
+            Button("Exit") { Task { await model.leaveDemo() } }
+                .buttonStyle(.bordered)
+                .tint(.white)
+                .controlSize(.small)
+        }
+        .foregroundStyle(.white)
     }
 }
 

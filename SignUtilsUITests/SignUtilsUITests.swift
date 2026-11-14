@@ -14,7 +14,7 @@ final class SignUtilsUITests: XCTestCase {
         let app = launch([])
         XCTAssertTrue(app.buttons["addKey"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["exploreDemo"].exists)
-        app.buttons["addKey"].tap()
+        press(app.buttons["addKey"])
         XCTAssertTrue(app.textFields["keyID"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["connect"].isEnabled)
     }
@@ -23,12 +23,12 @@ final class SignUtilsUITests: XCTestCase {
         let app = launch(["-demo"])
         let newBundle = app.buttons["newBundle"]
         XCTAssertTrue(newBundle.waitForExistence(timeout: 20))
-        newBundle.tap()
+        press(newBundle)
 
         tap(app.buttons["kind-development"])
         advance(app)
 
-        app.buttons["New"].firstMatch.tap()
+        press(app.buttons["New"].firstMatch)
         let identifier = app.textFields["newIdentifier"]
         XCTAssertTrue(identifier.waitForExistence(timeout: 5))
         type("com.demo.uitest", into: identifier)
@@ -51,21 +51,21 @@ final class SignUtilsUITests: XCTestCase {
 
         let generate = app.buttons["generate"]
         XCTAssertTrue(generate.waitForExistence(timeout: 5))
-        generate.tap()
+        press(generate)
         XCTAssertTrue(app.descendants(matching: .any)["generationSucceeded"].waitForExistence(timeout: 30))
         tap(app.buttons["finish"])
 
         let row = app.descendants(matching: .any).matching(identifier: "libraryRow").firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["com.demo.uitest"].exists || row.label.contains("com.demo.uitest"))
-        row.tap()
+        press(row)
 
         let revoke = app.buttons["revokeAll"]
         scrollTo(revoke, in: app)
-        revoke.tap()
+        press(revoke)
         let confirm = app.buttons["Revoke"].firstMatch
         XCTAssertTrue(confirm.waitForExistence(timeout: 5))
-        confirm.tap()
+        press(confirm)
         XCTAssertTrue(app.staticTexts["Certificate revoked"].waitForExistence(timeout: 15))
         let gone = NSPredicate(format: "exists == false")
         expectation(for: gone, evaluatedWith: app.buttons["revokeAll"])
@@ -79,23 +79,29 @@ final class SignUtilsUITests: XCTestCase {
         sleep(1)
         snapshot(app, "01_library")
 
-        row.tap()
+        press(row)
         XCTAssertTrue(app.buttons["shareArchive"].waitForExistence(timeout: 5))
         sleep(1)
         snapshot(app, "02_bundle")
-        navigateBack(app)
-
-        tap(app.buttons["newBundle"])
+        #if os(macOS)
+            app.typeKey("n", modifierFlags: .command)
+        #else
+            navigateBack(app)
+            tap(app.buttons["newBundle"])
+        #endif
         XCTAssertTrue(app.buttons["kind-development"].waitForExistence(timeout: 5))
         sleep(1)
         snapshot(app, "03_signing_type")
         advance(app)
 
-        tap(app.buttons["bundle-com.demo.feather"])
+        tap(app.buttons["bundle-com.demo.fieldnotes"])
         advance(app)
         XCTAssertTrue(app.switches["capability-APP_GROUPS"].waitForExistence(timeout: 10))
         toggle(app, "capability-ICLOUD")
         toggle(app, "capability-PUSH_NOTIFICATIONS")
+        #if os(iOS)
+            for _ in 0..<8 { app.swipeDown(velocity: .fast) }
+        #endif
         sleep(1)
         snapshot(app, "04_capabilities")
         advance(app)
@@ -121,10 +127,6 @@ final class SignUtilsUITests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
-        if let directory = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"], !directory.isEmpty {
-            try? FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true)
-            try? image.pngRepresentation.write(to: URL(fileURLWithPath: directory).appendingPathComponent("\(name).png"))
-        }
     }
 
     private func advance(_ app: XCUIApplication) {
@@ -133,28 +135,36 @@ final class SignUtilsUITests: XCTestCase {
         let enabled = NSPredicate(format: "isEnabled == true")
         expectation(for: enabled, evaluatedWith: button)
         waitForExpectations(timeout: 10)
-        button.tap()
+        press(button)
     }
 
     private func type(_ text: String, into element: XCUIElement) {
         for _ in 0..<5 {
-            element.tap()
+            press(element)
             if (element.value(forKey: "hasKeyboardFocus") as? Bool) == true { break }
             usleep(400_000)
         }
         element.typeText(text)
     }
 
+    private func press(_ element: XCUIElement) {
+        #if os(macOS)
+            element.click()
+        #else
+            element.tap()
+        #endif
+    }
+
     private func tap(_ element: XCUIElement) {
         XCTAssertTrue(element.waitForExistence(timeout: 10), "Missing \(element)")
-        element.tap()
+        press(element)
     }
 
     private func toggle(_ app: XCUIApplication, _ identifier: String) {
         let element = app.switches[identifier]
         scrollTo(element, in: app)
         #if os(iOS)
-            element.switches.firstMatch.exists ? element.switches.firstMatch.tap() : element.tap()
+            element.switches.firstMatch.exists ? element.switches.firstMatch.tap() : press(element)
         #else
             element.click()
         #endif

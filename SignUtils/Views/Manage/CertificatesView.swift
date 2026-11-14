@@ -45,6 +45,7 @@ struct CertificatesView: View {
                     ContentUnavailableView("No certificates", systemImage: "checkmark.seal", description: Text("Certificates you create appear here."))
                 }
             }
+            .adaptiveListStyle()
             .navigationTitle("Certificates")
             .refreshable { await model.refresh() }
             .toolbar { ToolbarItem(placement: .primaryAction) { RefreshButton() } }
@@ -89,6 +90,7 @@ private struct CertificateRow: View {
             }
         }
         .padding(.vertical, 2)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -133,6 +135,7 @@ struct ProfilesView: View {
                     ContentUnavailableView("No profiles", systemImage: "doc.badge.gearshape", description: Text("Provisioning profiles you create appear here."))
                 }
             }
+            .adaptiveListStyle()
             .navigationTitle("Profiles")
             .searchable(text: $search)
             .refreshable { await model.refresh() }
@@ -182,5 +185,6 @@ private struct ProfileRow: View {
             }
         }
         .padding(.vertical, 2)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }

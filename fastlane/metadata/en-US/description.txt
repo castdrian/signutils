@@ -1,4 +1,4 @@
-SignUtils takes the busywork out of preparing signing assets for sideloading with an Apple Developer Program membership.
+SignUtils takes the busywork out of preparing code signing assets for your Apple Developer Program team.
 
 Instead of creating a certificate signing request, registering an App ID, ticking capabilities, picking device UDIDs, downloading a certificate, exporting a .p12 and generating a provisioning profile by hand, you answer a few questions and SignUtils does the rest through the App Store Connect API.
 

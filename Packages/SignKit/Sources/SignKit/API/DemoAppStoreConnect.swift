@@ -59,8 +59,8 @@ public actor DemoAppStoreConnect: AppStoreConnectService {
                 deviceClass: .iPhone, model: "iPhone XS", status: .disabled, addedDate: now.addingTimeInterval(-4e7)),
         ]
         seed.bundleIDs = [
-            BundleID(id: "BID1", identifier: "com.demo.feather", name: "Feather", platform: .universal, seedID: Self.teamID),
-            BundleID(id: "BID2", identifier: "com.demo.emulator", name: "Emulator", platform: .universal, seedID: Self.teamID),
+            BundleID(id: "BID1", identifier: "com.demo.fieldnotes", name: "Field Notes", platform: .universal, seedID: Self.teamID),
+            BundleID(id: "BID2", identifier: "com.demo.pixelstudio", name: "Pixel Studio", platform: .universal, seedID: Self.teamID),
             BundleID(id: "BID3", identifier: "com.demo.*", name: "Demo Wildcard", platform: .universal, seedID: Self.teamID),
             BundleID(id: "BID4", identifier: "com.demo.music", name: "Music Player", platform: .ios, seedID: Self.teamID),
         ]

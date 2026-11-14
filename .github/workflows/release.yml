@@ -38,6 +38,7 @@ jobs:
         uses: ./.github/workflows/ci.yml
 
     version:
+        if: github.event_name == 'workflow_dispatch' || vars.APP_STORE_ENABLED == 'true'
         runs-on: ubuntu-24.04
         permissions:
             contents: write

@@ -7,6 +7,7 @@ struct LibraryView: View {
     @State private var search = ""
     @State private var filter: Filter = .all
     @State private var showsSettings = false
+    @State private var path: [UUID] = []
 
     enum Filter: String, CaseIterable, Identifiable {
         case all = "All"
@@ -32,25 +33,33 @@ struct LibraryView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(spacing: 0) {
-                List {
+                #if os(macOS)
                     DemoBanner()
                     if !model.entries.isEmpty {
-                        Section {
-                            Picker("Show", selection: $filter) {
-                                ForEach(Filter.allCases) { Text($0.rawValue).tag($0) }
-                            }
-                            .pickerStyle(.segmented)
-                            .labelsHidden()
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets())
-                        }
+                        filterPicker
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
                     }
-                    ForEach(visible) { entry in
-                        NavigationLink(value: entry.id) {
-                            LibraryRow(entry: entry)
+                #endif
+                Group {
+                #if os(macOS)
+                    macList
+                #else
+                List {
+                    #if os(iOS)
+                        DemoBanner()
+                        if !model.entries.isEmpty {
+                            Section {
+                                filterPicker
+                                    .listRowBackground(Color.clear)
+                                    .listRowInsets(EdgeInsets())
+                            }
                         }
+                    #endif
+                    ForEach(visible) { entry in
+                        row(for: entry)
                         .contextMenu {
                             if let url = model.archiveURL(for: entry) {
                                 ShareLink(item: url) { Label("Share Archive", systemImage: "square.and.arrow.up") }
@@ -69,6 +78,8 @@ struct LibraryView: View {
                             }
                         }
                     }
+                }
+                #endif
                 }
                 .overlay {
                     if model.entries.isEmpty {
@@ -90,6 +101,7 @@ struct LibraryView: View {
                     }
                 }
             }
+            .adaptiveListStyle()
             .navigationTitle("Library")
             .navigationDestination(for: UUID.self) { id in
                 if let entry = model.entries.first(where: { $0.id == id }) {
@@ -121,6 +133,56 @@ struct LibraryView: View {
                     .accessibilityIdentifier("newBundle")
                 }
             }
+        }
+    }
+}
+
+extension LibraryView {
+    #if os(macOS)
+        fileprivate var macList: some View {
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(visible) { entry in
+                        Button {
+                            path.append(entry.id)
+                        } label: {
+                            HStack {
+                                LibraryRow(entry: entry)
+                                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(.background.secondary, in: .rect(cornerRadius: 14))
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            if let url = model.archiveURL(for: entry) {
+                                ShareLink(item: url) { Label("Share Archive", systemImage: "square.and.arrow.up") }
+                            }
+                            Button("Copy Password") { Clipboard.copy(entry.bundle.password) }
+                            Divider()
+                            Button("Remove from Library", role: .destructive) { model.removeFromLibrary(entry) }
+                        }
+                    }
+                }
+                .padding(20)
+            }
+        }
+    #endif
+
+    fileprivate var filterPicker: some View {
+        Picker("Show", selection: $filter) {
+            ForEach(Filter.allCases) { Text($0.rawValue).tag($0) }
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+    }
+
+    @ViewBuilder
+    fileprivate func row(for entry: LibraryEntry) -> some View {
+        NavigationLink(value: entry.id) {
+            LibraryRow(entry: entry)
         }
     }
 }
@@ -158,6 +220,7 @@ struct LibraryRow: View {
             }
         }
         .padding(.vertical, 4)
+        .fixedSize(horizontal: false, vertical: true)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("libraryRow")
     }
