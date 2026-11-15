@@ -11,7 +11,7 @@ SwiftUI app for iPhone, iPad and Mac that turns App Store Connect API credential
 ## Download
 
 <p>
-  <a href="https://apps.apple.com/app/signutils/id0000000000"><img src="assets/app-store-badge.svg" alt="Download SignUtils on the App Store" height="60"></a>
+  <a href="https://apps.apple.com/app/signutils/id6834987090"><img src="assets/app-store-badge.svg" alt="Download SignUtils on the App Store" height="60"></a>
   &nbsp;
   <a href="https://github.com/itoolio/signutils"><img src="assets/github-badge.svg" alt="View the SignUtils source code on GitHub" height="60"></a>
 </p>
