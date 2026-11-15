@@ -1,1 +1,1 @@
-https://github.com/itoolio/signutils/blob/main/PRIVACY.md
+https://github.com/castdrian/signutils/blob/main/PRIVACY.md

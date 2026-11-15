@@ -23,4 +23,4 @@ Your API key and private keys stay in this device’s Keychain. SignUtils only t
 
 SignUtils requires an App Store Connect API key with the Admin or App Manager role. Explore the built-in demo to try every feature without one.
 
-SignUtils is open source: github.com/itoolio/signutils
+SignUtils is open source: github.com/castdrian/signutils

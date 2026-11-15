@@ -22,4 +22,4 @@ Archives leave the app only when you share or save them yourself through the sys
 
 ## Contact
 
-Questions about this policy can be raised at https://github.com/itoolio/signutils/issues.
+Questions about this policy can be raised at https://github.com/castdrian/signutils/issues.

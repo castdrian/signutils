@@ -1,8 +1,8 @@
 # SignUtils
 
-[![CI](https://github.com/itoolio/signutils/actions/workflows/ci.yml/badge.svg)](https://github.com/itoolio/signutils/actions/workflows/ci.yml)
-[![Release](https://github.com/itoolio/signutils/actions/workflows/release.yml/badge.svg)](https://github.com/itoolio/signutils/actions/workflows/release.yml)
-[![Live App Store Connect](https://github.com/itoolio/signutils/actions/workflows/e2e.yml/badge.svg)](https://github.com/itoolio/signutils/actions/workflows/e2e.yml)
+[![CI](https://github.com/castdrian/signutils/actions/workflows/ci.yml/badge.svg)](https://github.com/castdrian/signutils/actions/workflows/ci.yml)
+[![Release](https://github.com/castdrian/signutils/actions/workflows/release.yml/badge.svg)](https://github.com/castdrian/signutils/actions/workflows/release.yml)
+[![Live App Store Connect](https://github.com/castdrian/signutils/actions/workflows/e2e.yml/badge.svg)](https://github.com/castdrian/signutils/actions/workflows/e2e.yml)
 
 SwiftUI app for iPhone, iPad and Mac that turns App Store Connect API credentials into ready-to-import code signing assets.
 
@@ -13,7 +13,7 @@ SwiftUI app for iPhone, iPad and Mac that turns App Store Connect API credential
 <p>
   <a href="https://apps.apple.com/app/signutils/id6834987090"><img src="assets/app-store-badge.svg" alt="Download SignUtils on the App Store" height="60"></a>
   &nbsp;
-  <a href="https://github.com/itoolio/signutils"><img src="assets/github-badge.svg" alt="View the SignUtils source code on GitHub" height="60"></a>
+  <a href="https://github.com/castdrian/signutils"><img src="assets/github-badge.svg" alt="View the SignUtils source code on GitHub" height="60"></a>
 </p>
 
 ## Features
@@ -60,4 +60,4 @@ App Store screenshots are rendered from the demo by UI tests:
 
 ## Contributors
 
-[![Contributors](https://contrib.rocks/image?repo=itoolio/signutils)](https://github.com/itoolio/signutils/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=castdrian/signutils)](https://github.com/castdrian/signutils/graphs/contributors)

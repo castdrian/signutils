@@ -82,10 +82,10 @@ struct SettingsView: View {
 
                 Section("About") {
                     LabeledContent("Version", value: version)
-                    Link(destination: URL(string: "https://github.com/itoolio/signutils")!) {
+                    Link(destination: URL(string: "https://github.com/castdrian/signutils")!) {
                         Label("Source Code", systemImage: "chevron.left.forwardslash.chevron.right")
                     }
-                    Link(destination: URL(string: "https://github.com/itoolio/signutils/issues")!) {
+                    Link(destination: URL(string: "https://github.com/castdrian/signutils/issues")!) {
                         Label("Report an Issue", systemImage: "ladybug")
                     }
                     Link(destination: URL(string: "https://github.com/sponsors/castdrian")!) {
