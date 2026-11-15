@@ -1,3 +1,19 @@
-SignUtils needs an App Store Connect API key from a paid Apple Developer Program membership. To review every feature without one, tap "Explore the Demo" on the first screen. The demo runs entirely on the device against simulated App Store Connect data, so creating, sharing and revoking signing bundles works without an account.
+1. Screen recording
+Recorded on a physical iPhone 15 Pro Max running iOS 27.2.1, starting at app launch: https://github.com/castdrian/signutils/releases/download/v1.0.0/SignUtils-iOS-walkthrough.mp4
+It shows the first screen, the Add API Key form, the demo, the full create flow (signing type, App ID, capabilities, devices, certificate, review, generation), sharing the archive, revoking the certificate and the Certificates, Profiles, App IDs and Devices screens. SignUtils has no account registration, no user-generated content and no paid content.
 
-With a real key, SignUtils calls only api.appstoreconnect.apple.com to manage the developer's own certificates, App IDs, devices and provisioning profiles, and stores the key and generated private keys in the Keychain. Generated archives are saved in the app's container and shared through the system share sheet or save panel.
+2. Purpose and audience
+SignUtils is a developer tool for members of the Apple Developer Program. Producing a development or ad hoc build for test devices normally means visiting the developer portal to register an App ID, pick capabilities and devices, create a certificate signing request in Keychain Access, generate a certificate, export a .p12 and download a provisioning profile. SignUtils does all of this in one guided flow from an iPhone, iPad or Mac using the developer's own App Store Connect API key, and returns a zip with the .p12, its password and the matching .mobileprovision. It also keeps a library of every bundle created and lets developers revoke certificates, delete profiles and App IDs, edit capabilities and manage registered devices.
+
+3. Setup and access
+No login or account is needed for review. On the first screen tap "Explore the Demo". The demo runs entirely on the device against simulated App Store Connect data, so every feature works, including creating, sharing and revoking signing bundles. Steps: tap + in the Library, choose Development, pick an App ID, choose capabilities, select devices, choose "Create a new certificate", then Generate. Open the bundle in the Library to share it or revoke it. The other tabs manage certificates, profiles, App IDs and devices.
+With a real account, the developer creates an API key in App Store Connect under Users and Access > Integrations, then taps "Add App Store Connect API Key" and enters the key ID, issuer ID and .p8 private key.
+
+4. External services
+SignUtils only talks to Apple's App Store Connect API (api.appstoreconnect.apple.com), authenticated with the developer's own API key. It uses no other services, no analytics, no advertising, no AI services and no servers of its own. Keys and generated private keys are stored in the Keychain.
+
+5. Regional differences
+SignUtils works the same in every region. There are no regional differences in features or content.
+
+6. Regulated industries and third-party material
+SignUtils does not operate in a regulated industry and contains no protected third-party material. It only manages the developer's own signing assets through Apple's public API.

@@ -72,6 +72,108 @@ final class SignUtilsUITests: XCTestCase {
         waitForExpectations(timeout: 15)
     }
 
+    func testReviewWalkthrough() {
+        #if os(iOS)
+            XCUIDevice.shared.press(.home)
+            linger(3)
+        #endif
+        let app = launch([])
+        let demo = app.buttons["exploreDemo"]
+        XCTAssertTrue(demo.waitForExistence(timeout: 20))
+        linger(3)
+        press(app.buttons["addKey"])
+        XCTAssertTrue(app.textFields["keyID"].waitForExistence(timeout: 5))
+        linger(3)
+        app.swipeDown(velocity: .fast)
+        XCTAssertTrue(demo.waitForExistence(timeout: 10))
+        linger()
+        press(demo)
+
+        let newBundle = app.buttons["newBundle"]
+        XCTAssertTrue(newBundle.waitForExistence(timeout: 30))
+        linger(3)
+        press(newBundle)
+
+        tap(app.buttons["kind-development"])
+        linger()
+        advance(app)
+
+        tap(app.buttons["bundle-com.demo.fieldnotes"])
+        linger()
+        advance(app)
+
+        XCTAssertTrue(app.switches["capability-APP_GROUPS"].waitForExistence(timeout: 10))
+        linger()
+        toggle(app, "capability-APP_GROUPS")
+        toggle(app, "capability-PUSH_NOTIFICATIONS")
+        linger()
+        advance(app)
+
+        tap(app.buttons["selectAllDevices"])
+        linger()
+        let name = app.textFields["newDeviceName"]
+        scrollTo(name, in: app)
+        type("Review iPhone\n", into: name)
+        app.typeText("00008130-000A1B2C3D4E5F60\n")
+        XCTAssertTrue(app.staticTexts["00008130-000A1B2C3D4E5F60"].waitForExistence(timeout: 5))
+        linger()
+        advance(app)
+
+        tap(app.buttons["newCertificate"])
+        linger()
+        advance(app)
+
+        let generate = app.buttons["generate"]
+        XCTAssertTrue(generate.waitForExistence(timeout: 5))
+        linger(3)
+        press(generate)
+        XCTAssertTrue(app.descendants(matching: .any)["generationSucceeded"].waitForExistence(timeout: 30))
+        linger(4)
+        tap(app.buttons["finish"])
+
+        let row = app.descendants(matching: .any).matching(identifier: "libraryRow").firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        linger()
+        press(row)
+
+        let share = app.buttons["shareArchive"]
+        XCTAssertTrue(share.waitForExistence(timeout: 5))
+        linger(3)
+        press(share)
+        linger(3)
+        let close = app.buttons["Close"].firstMatch
+        if close.waitForExistence(timeout: 5) {
+            close.tap()
+        } else {
+            app.swipeDown(velocity: .fast)
+        }
+        linger()
+
+        let revoke = app.buttons["revokeAll"]
+        scrollTo(revoke, in: app)
+        linger()
+        press(revoke)
+        let confirm = app.buttons["Revoke"].firstMatch
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5))
+        linger()
+        press(confirm)
+        XCTAssertTrue(app.staticTexts["Certificate revoked"].waitForExistence(timeout: 15))
+        linger(3)
+        navigateBack(app)
+        linger()
+
+        for tab in ["Certificates", "Profiles", "App IDs", "Devices", "Library"] {
+            let button = app.tabBars.buttons[tab]
+            guard button.waitForExistence(timeout: 5) else { continue }
+            button.tap()
+            linger(3)
+        }
+    }
+
+    private func linger(_ seconds: UInt32 = 2) {
+        sleep(seconds)
+    }
+
     func testScreenshots() throws {
         let app = launch(["-screenshots"])
         let row = app.descendants(matching: .any).matching(identifier: "libraryRow").firstMatch
